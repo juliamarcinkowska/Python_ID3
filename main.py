@@ -32,11 +32,9 @@ def main():
                   ["catsize", [0, 1]],
                   ["animal_type", ["mammal", "bird", "reptile", "fish", "amphibian", "insect", "invertebrate"]]]
     classes = attributes[16][1]
+    attributes.pop(16)
     instances = read_instances("zoo.csv")
-    build(instances, attributes, classes, "mammal")
-    print(instances.__len__())
-    # id3 = ID3(concept, instances, attributes)
-    # id3.run()
+    build(instances, attributes, classes, None, "mammal")
 
 
 if __name__ == "__main__":
