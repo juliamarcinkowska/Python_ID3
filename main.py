@@ -33,7 +33,7 @@ def main():
                   ["animal_type", ["mammal", "bird", "reptile", "fish", "amphibian", "insect", "invertebrate"]]]
     classes = attributes[16][1]
     instances = read_instances("zoo.csv")
-    build(instances, [], classes, "mammal")
+    build(instances, attributes, classes, "mammal")
     print(instances.__len__())
     # id3 = ID3(concept, instances, attributes)
     # id3.run()
