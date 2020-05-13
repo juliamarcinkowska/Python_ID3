@@ -12,15 +12,7 @@ def read_instances(file):
 
 
 def count(instances, classes):
-    lst = []
-    for c in classes:
-        tmp = 0
-        for i in instances:
-            if i.animal_type == c:
-                tmp += 1
-        lst.append([c, tmp])
-    # lst = [[instances.count(c) for number in c] for c in classes]
-    return lst
+    return [[c, sum(i.animal_type == c for i in instances)] for c in classes]
 
 
 def choose_attr(instances, attributes, classes):
