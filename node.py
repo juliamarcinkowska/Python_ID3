@@ -7,7 +7,6 @@ class Node:
         self.name = ""
         self.instances = []
         self.branches = []
-        self.tree_lvl = 0
 
 
 def count(instances, classes):
@@ -36,22 +35,9 @@ def choose_attr(instances, attributes, classes):
     return best_attr
 
 
-def print_tree(node, counter, text):
-    if not node.branches:
-        text += ' ' + node.name
-        print(text)
-        return
-    print(text)
-    for n in range(len(node.branches)):
-        text = node.name + " = " + str(node.branches[n].value) + ':'
-        if node.branches:
-            print_tree(node.branches[n], counter + 1, text.rjust(counter * 2 + len(text)))
-
-
-def build(instances, attributes, classes, value, default, prev_attr, counter=0):
+def build(instances, attributes, classes, value, default, prev_attr):
     node = Node()
     node.value = value
-    node.tree_lvl = counter
     if not instances:
         node.name = default
         # print_tree(node, counter)
@@ -71,15 +57,22 @@ def build(instances, attributes, classes, value, default, prev_attr, counter=0):
         # print_tree(node, counter)
         return node
     else:
-        if prev_attr:
-            attr = attributes.copy()
-            attributes.clear()
-            for i in range(len(attr)):
-                if attr[i][0] not in prev_attr:
-                    attributes.append(attr[i])
-        best_attribute = choose_attr(instances, attributes, classes)
-        prev_attr.append(attributes[best_attribute][0])
-        new_attributes = attributes.copy()
+        try:
+            best_attribute = choose_attr(instances, attributes, classes)
+            while attributes[best_attribute][0] in prev_attr:
+                if len(attributes) > 1:
+                    attributes.pop(best_attribute)
+                    best_attribute = choose_attr(instances, attributes, classes)
+                else:
+                    lst = count(instances, classes)
+                    for i in range(lst.__len__()):
+                        if lst[i][1] == max([sublist[-1] for sublist in lst]):
+                            node.name = lst[i][0]
+                    return node
+            prev_attr.append(attributes[best_attribute][0])
+            new_attributes = attributes.copy()
+        except IndexError:
+            print(best_attribute, len(attributes))
 
         branches = []
         for a in range(attributes[best_attribute][1].__len__()):
@@ -89,7 +82,7 @@ def build(instances, attributes, classes, value, default, prev_attr, counter=0):
             for i in range(lst.__len__()):
                 if lst[i][1] == max([sublist[-1] for sublist in lst]):
                     default = lst[i][0]
-            new_branch = build(new_instances, new_attributes, classes, a, default, prev_attr, counter + 1)
+            new_branch = build(new_instances, new_attributes, classes, a, default, prev_attr)
             branches.append(new_branch)
 
         node.value = value

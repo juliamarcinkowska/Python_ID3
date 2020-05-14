@@ -1,10 +1,9 @@
 import csv
 import math
 import random
-from operator import attrgetter
 
 from animal import Animal
-from node import Node, build
+from node import build
 
 
 def read_instances(file):
@@ -14,15 +13,16 @@ def read_instances(file):
     return objects
 
 
-def build_tree(node, tree):
+def print_tree(node, counter, text):
     if not node.branches:
-        tree.append(node)
-        return tree
-    tree.append(node)
+        text += ' ' + node.name
+        print(text)
+        return
+    print(text)
     for n in range(len(node.branches)):
+        text = node.name + " = " + str(node.branches[n].value) + ':'
         if node.branches:
-            build_tree(node.branches[n], tree)
-    return tree
+            print_tree(node.branches[n], counter + 1, text.rjust(counter * 2 + len(text)))
 
 
 def classify(node, animal):
@@ -60,8 +60,8 @@ def main():
     classes = attributes[16][1]
     attributes.pop(16)
     instances = read_instances("zoo.csv")
-    # root_node = build(instances, attributes, classes, None, "mammal", [])
-    # print_tree(root_node, 0, '')
+    root_node = build(instances, attributes, classes, None, "mammal", [])
+    print_tree(root_node, 0, '')
     # tree = build_tree(root_node, [])
     # classify(root_node, instances[1])
     results = 0
