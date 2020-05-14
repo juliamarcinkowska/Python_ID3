@@ -6,26 +6,26 @@ from animal import Animal
 from node import build
 
 
-def read_instances(file):
+def read_instances(file):  # create list of Animal objects from csv file
     with open(file, newline='') as csvfile:
         reader = csv.reader(csvfile, delimiter=',')
         objects = [Animal(row) for row in reader]
     return objects
 
 
-def print_tree(node, counter, text):
-    if not node.branches:
+def print_tree(node, counter, text):  # print tree with indentation (recursively) based on root node
+    if not node.branches:  # leaves
         text += ' ' + node.name
         print(text)
         return
     print(text)
-    for n in range(len(node.branches)):
+    for n in range(len(node.branches)):  # branches
         text = node.name + " = " + str(node.branches[n].value) + ':'
         if node.branches:
             print_tree(node.branches[n], counter + 1, text.rjust(counter * 2 + len(text)))
 
 
-def classify(node, animal):
+def classify(node, animal):  # recursive function that classifies animal based on nodes
     if node.branches:
         for b in node.branches:
             if b.value == animal.__getattribute__(node.name):
@@ -39,7 +39,6 @@ def classify(node, animal):
 
 
 def main():
-    concept = "animal type"
     attributes = [["hair", [0, 1]],
                   ["feathers", [0, 1]],
                   ["eggs", [0, 1]],
@@ -58,13 +57,13 @@ def main():
                   ["catsize", [0, 1]],
                   ["animal_type", ["mammal", "bird", "reptile", "fish", "amphibian", "insect", "invertebrate"]]]
     classes = attributes[16][1]
-    attributes.pop(16)
+    attributes.pop(16)  # copy animal_type to classes and delete from attributes
+
     instances = read_instances("zoo.csv")
     root_node = build(instances, attributes, classes, None, "mammal", [])
     print_tree(root_node, 0, '')
-    # tree = build_tree(root_node, [])
-    # classify(root_node, instances[1])
-    results = 0
+
+    results = 0  # testing algorithm
     for i in range(10):
         success = 0
         random.shuffle(instances)
@@ -78,8 +77,6 @@ def main():
         results += success / len(test_set)
     precision = results / 10
     print(precision)
-    # for u in tree:
-    #     print(u.name)
 
 
 if __name__ == "__main__":

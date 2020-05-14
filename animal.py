@@ -1,4 +1,4 @@
-def assign_type(x):
+def assign_type(x):  # switch case function to assign string as animal_type
     return {
         '1': 'mammal',
         '2': 'bird',
