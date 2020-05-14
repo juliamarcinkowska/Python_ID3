@@ -24,17 +24,14 @@ def build_tree(node, tree):
     return tree
 
 
-def classify(tree, animal):
-    in_nodes = []
-    for t in tree:
-        if animal in t.instances:
-            in_nodes.append(t)
-    chosen_node = max(in_nodes, key=attrgetter('tree_lvl'))
-    value = animal.__getattribute__(chosen_node.name)
-    for br in chosen_node.branches:
-        if br.value == value:
-            leaf = br.name
-    print(animal.animal_name + " is " + animal.animal_type + " and is classified as " + leaf)
+def classify(node, animal):
+    if node.branches:
+        for b in node.branches:
+            if b.value == animal.__getattribute__(node.name):
+                classify(b, animal)
+    else:
+        print(animal.animal_name + " is " + animal.animal_type + " and is classified as " + node.name)
+        return True
 
 
 def main():
@@ -63,7 +60,7 @@ def main():
     root_node = node.build(instances, attributes, classes, None, "mammal", [])
     # root_node.print_tree(root_node, 0, '')
     tree = build_tree(root_node, [])
-    classify(tree, instances[61])
+    classify(root_node, instances[1])
     # for u in tree:
     #     print(u.name)
 
