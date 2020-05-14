@@ -1,9 +1,10 @@
 import csv
 import math
+import random
 from operator import attrgetter
 
 from animal import Animal
-from node import Node
+from node import Node, build
 
 
 def read_instances(file):
@@ -28,10 +29,13 @@ def classify(node, animal):
     if node.branches:
         for b in node.branches:
             if b.value == animal.__getattribute__(node.name):
-                classify(b, animal)
+                return classify(b, animal)
     else:
-        print(animal.animal_name + " is " + animal.animal_type + " and is classified as " + node.name)
-        return True
+        if node.name == animal.animal_type:
+            return True
+        else:
+            print(animal.animal_name + " is " + animal.animal_type + " and is classified as " + node.name)
+            return False
 
 
 def main():
@@ -56,11 +60,24 @@ def main():
     classes = attributes[16][1]
     attributes.pop(16)
     instances = read_instances("zoo.csv")
-    node = Node()
-    root_node = node.build(instances, attributes, classes, None, "mammal", [])
-    # root_node.print_tree(root_node, 0, '')
-    tree = build_tree(root_node, [])
-    classify(root_node, instances[1])
+    # root_node = build(instances, attributes, classes, None, "mammal", [])
+    # print_tree(root_node, 0, '')
+    # tree = build_tree(root_node, [])
+    # classify(root_node, instances[1])
+    results = 0
+    for i in range(10):
+        success = 0
+        random.shuffle(instances)
+        test_instances = instances.copy()
+        test_set = test_instances[:math.ceil(len(test_instances) / 10)]
+        training_set = test_instances[math.ceil(len(test_instances) / 10):]
+        new_root_node = build(training_set, attributes, classes, None, "mammal", [])
+        for ts in test_set:
+            if classify(new_root_node, ts):
+                success += 1
+        results += success / len(test_set)
+    precision = results / 10
+    print(precision)
     # for u in tree:
     #     print(u.name)
 
