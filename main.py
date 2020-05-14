@@ -2,7 +2,7 @@ import csv
 import math
 
 from animal import Animal
-from node import build
+from node import Node
 
 
 def read_instances(file):
@@ -10,6 +10,17 @@ def read_instances(file):
         reader = csv.reader(csvfile, delimiter=',')
         objects = [Animal(row) for row in reader]
     return objects
+
+
+def build_tree(node, tree):
+    if not node.branches:
+        tree.append(node)
+        return tree
+    tree.append(node)
+    for n in range(len(node.branches)):
+        if node.branches:
+            build_tree(node.branches[n], tree)
+    return tree
 
 
 def main():
@@ -34,7 +45,13 @@ def main():
     classes = attributes[16][1]
     attributes.pop(16)
     instances = read_instances("zoo.csv")
-    build(instances, attributes, classes, None, "mammal")
+    node = Node()
+    root_node = node.build(instances, attributes, classes, None, "mammal", [])
+    root_node.print_tree(root_node, 0, '')
+    tree = build_tree(root_node, [])
+    print("Hielp")
+    # for i in tree:
+    #     print(i.name)
 
 
 if __name__ == "__main__":
