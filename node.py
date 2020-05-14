@@ -33,6 +33,7 @@ class Node:
         self.name = ""
         self.instances = []
         self.branches = []
+        self.tree_lvl = 0
 
     def print_tree(self, node, counter, text):
         if not node.branches:
@@ -45,9 +46,10 @@ class Node:
             if node.branches:
                 self.print_tree(node.branches[n], counter + 1, text.rjust(counter * 2 + len(text)))
 
-    def build(self, instances, attributes, classes, value, default, prev_attr):
+    def build(self, instances, attributes, classes, value, default, prev_attr, counter=0):
         node = Node()
         node.value = value
+        node.tree_lvl = counter
         if not instances:
             node.name = default
             # print_tree(node, counter)
@@ -67,14 +69,15 @@ class Node:
             # print_tree(node, counter)
             return node
         else:
+            if prev_attr:
+                attr = attributes.copy()
+                attributes.clear()
+                for i in range(len(attr)):
+                    if attr[i][0] not in prev_attr:
+                        attributes.append(attr[i])
             best_attribute = choose_attr(instances, attributes, classes)
-            while attributes[best_attribute][0] in prev_attr:
-                attributes.pop(best_attribute)
-                best_attribute = choose_attr(instances, attributes, classes)
             prev_attr.append(attributes[best_attribute][0])
             new_attributes = attributes.copy()
-            new_attributes.pop(best_attribute)
-            print(len(new_attributes))
 
             branches = []
             for a in range(attributes[best_attribute][1].__len__()):
@@ -84,7 +87,7 @@ class Node:
                 for i in range(lst.__len__()):
                     if lst[i][1] == max([sublist[-1] for sublist in lst]):
                         default = lst[i][0]
-                new_branch = self.build(new_instances, new_attributes, classes, a, default, prev_attr)
+                new_branch = self.build(new_instances, new_attributes, classes, a, default, prev_attr, counter + 1)
                 branches.append(new_branch)
 
             node.value = value
