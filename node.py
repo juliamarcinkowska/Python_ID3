@@ -35,12 +35,16 @@ def choose_attr(instances, attributes, classes):
     return best_attr
 
 
-def print_tree(node, counter):
+def print_tree(node, counter, text):
     if not node.branches:
-        string = node.name + ' = ' + str(node.value)
-    else:
-        string = node.name + ' = ' + str(node.value) + ' ' + str(node.branches[-1].name)
-    print(string.rjust(counter * 2 + len(string)))
+        text += ' ' + node.name
+        print(text)
+        return
+    print(text)
+    for n in range(len(node.branches)):
+        text = node.name + " = " + str(node.branches[n].value) + ':'
+        if node.branches:
+            print_tree(node.branches[n], counter + 1, text.rjust(counter * 2 + len(text)))
 
 
 def build(instances, attributes, classes, value, default, counter=0):
@@ -48,21 +52,21 @@ def build(instances, attributes, classes, value, default, counter=0):
     node.value = value
     if not instances:
         node.name = default
-        print_tree(node, counter)
+        # print_tree(node, counter)
         return node
     elif not attributes:
         lst = count(instances, classes)
         for i in range(lst.__len__()):
             if lst[i][1] == max([sublist[-1] for sublist in lst]):
                 node.name = lst[i][0]
-        print_tree(node, counter)
+        # print_tree(node, counter)
         return node
     elif instances.__len__() == max([sublist[-1] for sublist in count(instances, classes)]):
         lst = count(instances, classes)
         for i in range(lst.__len__()):
             if lst[i][1] == max([sublist[-1] for sublist in lst]):
                 node.name = lst[i][0]
-        print_tree(node, counter)
+        # print_tree(node, counter)
         return node
     else:
         best_attribute = choose_attr(instances, attributes, classes)
@@ -83,5 +87,6 @@ def build(instances, attributes, classes, value, default, counter=0):
         node.name = attributes[best_attribute][0]
         node.instances = instances
         node.branches = branches
-        print_tree(node, counter)
+        if counter == 0:
+            print_tree(node, counter, '')
         return node
