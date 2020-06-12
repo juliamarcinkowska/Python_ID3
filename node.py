@@ -13,6 +13,14 @@ def count(instances, classes):
     return [[c, sum(i.animal_type == c for i in instances)] for c in classes]
 
 
+def assign_leaf_name(instances, classes, node):
+    lst = count(instances, classes)
+    for i in range(lst.__len__()):
+        if lst[i][1] == max([sublist[-1] for sublist in lst]):
+            node.name = lst[i][0]
+    return node
+
+
 def choose_attr(instances, attributes, classes):
     min_entropy = 100
     best_attr = -1
@@ -42,35 +50,20 @@ def build(instances, attributes, classes, value, default, prev_attr):
     if not instances:
         node.name = default
         return node
-    # if attribute list is empty, assign type of majority of instances left as leaf name
-    elif not attributes:
-        lst = count(instances, classes)
-        for i in range(lst.__len__()):
-            if lst[i][1] == max([sublist[-1] for sublist in lst]):
-                node.name = lst[i][0]
-        return node
-    # if all instance are of the same type, assign this type as leaf name
-    elif instances.__len__() == max([sublist[-1] for sublist in count(instances, classes)]):
-        lst = count(instances, classes)
-        for i in range(lst.__len__()):
-            if lst[i][1] == max([sublist[-1] for sublist in lst]):
-                node.name = lst[i][0]
-        return node
+    # if attribute list is empty, assign type of majority of instances left as leaf name or if all instances
+    # are of the same type, assign this type as leaf name
+    elif not attributes or instances.__len__() == max([sublist[-1] for sublist in count(instances, classes)]):
+        return assign_leaf_name(instances, classes, node)
     else:
         best_attribute = choose_attr(instances, attributes, classes)
         while attributes[best_attribute][0] in prev_attr:  # check if chosen attribute's name is in previous best attr
             if len(attributes) > 1:  # if more than 1 attribute left in list, pop it and choose new one
                 attributes.pop(best_attribute)
                 best_attribute = choose_attr(instances, attributes, classes)
-            else:  # if one attribute left, do the if for empty attribute list
-                lst = count(instances, classes)
-                for i in range(lst.__len__()):
-                    if lst[i][1] == max([sublist[-1] for sublist in lst]):
-                        node.name = lst[i][0]
-                return node
+            else:  # if one attribute left
+                return assign_leaf_name(instances, classes, node)
         prev_attr.append(attributes[best_attribute][0])  # add best attribute to previous best attributes
         new_attributes = attributes.copy()
-
         branches = []
         for a in range(attributes[best_attribute][1].__len__()):
             new_instances = [inst for inst in instances if
