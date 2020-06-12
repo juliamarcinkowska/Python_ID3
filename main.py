@@ -1,6 +1,7 @@
 import csv
 import math
 import random
+import statistics
 
 from animal import Animal
 from node import build
@@ -33,7 +34,7 @@ def classify(node, animal):  # recursive function that classifies animal based o
     else:
         if node.name == animal.animal_type:
             return True
-        else:
+        else:  # it prints only incorrectly classified animals for legibility
             print(animal.animal_name + " is " + animal.animal_type + " and is classified as " + node.name)
             return False
 
@@ -61,22 +62,29 @@ def main():
 
     instances = read_instances("zoo.csv")
     root_node = build(instances, attributes, classes, None, "mammal", [])
-    print_tree(root_node, 0, '')
+    print_tree(root_node, 0, '')  # print tree built with all instances
 
-    results = 0  # testing algorithm
-    for i in range(10):
-        success = 0
-        random.shuffle(instances)
-        test_instances = instances.copy()
-        test_set = test_instances[:math.ceil(len(test_instances) / 10)]
-        training_set = test_instances[math.ceil(len(test_instances) / 10):]
-        new_root_node = build(training_set, attributes, classes, None, "mammal", [])
-        for ts in test_set:
-            if classify(new_root_node, ts):
-                success += 1
-        results += success / len(test_set)
-    precision = results / 10
-    print(precision)
+    final_results = []
+    for j in range(10):
+        results = 0  # testing algorithm
+        print("  ------  j = " + str(j) + "  ------  ")
+        for i in range(10):
+            success = 0
+            random.shuffle(instances)  # shuffling of all instances
+            test_instances = instances.copy()
+            test_set = test_instances[:math.ceil(len(test_instances) / 10)]  # 10% of instances are test set
+            training_set = test_instances[math.ceil(len(test_instances) / 10):]  # 90% of instances are training set
+            new_root_node = build(training_set, attributes, classes, None, "mammal",
+                                  [])  # tree based on training instances
+            for ts in test_set:
+                if classify(new_root_node, ts):
+                    success += 1
+            results += success / len(test_set)
+        precision = results / 10
+        final_results.append(precision)
+    print(final_results)
+    print("Avg of final results: " + str(sum(final_results) / len(final_results)))
+    print("Std of final results: " + str(statistics.stdev(final_results)))
 
 
 if __name__ == "__main__":
